@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gindi AI-Agent | מערכת ניהול מסירות ובדק</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700;800;900&display=swap');
+
+  :root {
+    --navy:       #0B1F3A;
+    --navy-mid:   #122847;
+    --navy-light: #1A3A5C;
+    --gold:       #C9A84C;
+    --gold-light: #E8C97A;
+    --white:      #FFFFFF;
+    --gray-100:   #F4F6F9;
+    --gray-200:   #E2E8F0;
+    --gray-400:   #94A3B8;
+    --gray-600:   #64748B;
+    --red:        #E53E3E;
+    --green:      #2F855A;
+    --green-light:#38A169;
+    --orange:     #DD6B20;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Heebo', sans-serif;
+    background: var(--navy);
+    color: var(--white);
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ── LOGIN OVERLAY ── */
+  #login-overlay {
+    position: fixed; inset: 0;
+    background: linear-gradient(135deg, var(--navy) 0%, #071428 100%);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 9999;
+  }
+  .login-card {
+    background: var(--navy-mid);
+    border: 1px solid rgba(201,168,76,0.3);
+    border-radius: 16px;
+    padding: 48px 40px;
+    width: 380px;
+    box-shadow: 0 24px 80px rgba(0,0,0,0.6);
+    text-align: center;
+  }
+  .login-logo {
+    font-size: 13px; font-weight: 700; letter-spacing: 3px;
+    color: var(--gold); text-transform: uppercase; margin-bottom: 6px;
+  }
+  .login-title {
+    font-size: 22px; font-weight: 800; color: var(--white); margin-bottom: 6px;
+  }
+  .login-sub {
+    font-size: 12px; color: var(--gray-400); margin-bottom: 32px;
+  }
+  .login-label {
+    display: block; text-align: right; font-size: 12px;
+    color: var(--gray-400); margin-bottom: 6px; font-weight: 500;
+  }
+  .login-input {
+    width: 100%;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 8px;
+    padding: 12px 14px;
+    color: var(--white);
+    font-family: 'Heebo', sans-serif;
+    font-size: 15px;
+    letter-spacing: 2px;
+    margin-bottom: 20px;
+    outline: none;
+    text-align: center;
+    transition: border-color 0.2s;
+  }
+  .login-input:focus { border-color: var(--gold); }
+  .login-btn {
+    width: 100%;
+    background: linear-gradient(135deg, var(--gold) 0%, var(--gold-light) 100%);
+    border: none; border-radius: 8px;
+    padding: 13px;
+    font-family: 'Heebo', sans-serif;
+    font-size: 15px; font-weight: 700;
+    color: var(--navy);
+    cursor: pointer;
+    transition: opacity 0.2s, transform 0.1s;
+  }
+  .login-btn:hover { opacity: 0.9; transform: translateY(-1px); }
+  .login-btn:active { transform: translateY(0); }
+  .login-error {
+    color: #FC8181; font-size: 13px; margin-top: 12px;
+    display: none; background: rgba(229,62,62,0.1);
+    border-radius: 6px; padding: 8px;
+  }
+  .login-deco {
+    width: 48px; height: 3px;
+    background: linear-gradient(90deg, var(--gold), transparent);
+    margin: 0 auto 24px;
+    border-radius: 2px;
+  }
+
+  /* ── HEADER ── */
+  .header {
+    background: var(--navy-mid);
+    border-bottom: 1px solid rgba(201,168,76,0.25);
+    padding: 0 24px;
+    height: 60px;
+    display: flex; align-items: center; justify-content: space-between;
+    flex-shrink: 0;
+    box-shadow: 0 2px 20px rgba(0,0,0,0.4);
+  }
+  .header-brand {
+    display: flex; align-items: center; gap: 14px;
+  }
+  .header-logo-box {
+    width: 36px; height: 36px;
+    background: linear-gradient(135deg, var(--gold), var(--gold-light));
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 900; font-size: 16px; color: var(--navy);
+    flex-shrink: 0;
+  }
+  .header-title {
+    font-size: 13px; font-weight: 700; color: var(--white); line-height: 1.3;
+  }
+  .header-sub {
+    font-size: 10px; color: var(--gray-400); font-weight: 400;
+  }
+  .header-user {
+    display: flex; align-items: center; gap: 10px;
+  }
+  .user-badge {
+    text-align: left;
+  }
+  .user-name {
+    font-size: 13px; font-weight: 700; color: var(--gold);
+  }
+  .user-role {
+    font-size: 10px; color: var(--gray-400);
+  }
+  .user-avatar {
+    width: 34px; height: 34px;
+    background: linear-gradient(135deg, var(--navy-light), var(--gold));
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; font-weight: 800; color: var(--white);
+    border: 2px solid rgba(201,168,76,0.4);
+  }
+  .header-live {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 11px; color: var(--green-light); font-weight: 600;
+  }
+  .live-dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: var(--green-light);
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(0.8); }
+  }
+
+  /* ── MAIN SPLIT ── */
+  .main {
+    display: grid;
+    grid-template-columns: 420px 1fr;
+    gap: 0;
+    flex: 1;
+    overflow: hidden;
+  }
+
+  /* ── LEFT: CHAT ── */
+  .chat-panel {
+    background: var(--navy-mid);
+    border-left: 1px solid rgba(255,255,255,0.06);
+    display: flex; flex-direction: column;
+    overflow: hidden;
+  }
+  .chat-header {
+    padding: 14px 18px 12px;
+    border-bottom: 1px solid rgba(255,255,255,0.07);
+    background: rgba(255,255,255,0.02);
+    flex-shrink: 0;
+  }
+  .chat-header-title {
+    font-size: 13px; font-weight: 700; color: var(--white);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .chat-icon {
+    width: 24px; height: 24px;
+    background: linear-gradient(135deg, var(--gold), var(--gold-light));
+    border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px;
+  }
+  .chat-header-sub {
+    font-size: 10px; color: var(--gray-400); margin-top: 2px;
+  }
+  .chat-body {
+    flex: 1;
+    overflow: hidden;
+    padding: 0;
+    position: relative;
+  }
+  .chat-body zapier-interfaces-chatbot-embed {
+    position: absolute;
+    inset: 0;
+    width: 100% !important;
+    height: 100% !important;
+    display: block;
+  }
+
+  /* ── RIGHT: DASHBOARD ── */
+  .dashboard-panel {
+    background: var(--gray-100);
+    overflow-y: auto;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  /* KPI CARDS */
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+  }
+  .kpi-card {
+    background: var(--white);
+    border-radius: 12px;
+    padding: 18px 16px 14px;
+    border: 1px solid var(--gray-200);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    position: relative;
+    overflow: hidden;
+  }
+  .kpi-card::before {
+    content: '';
+    position: absolute; top: 0; right: 0; left: 0;
+    height: 3px;
+  }
+  .kpi-card.blue::before  { background: linear-gradient(90deg, var(--navy), var(--navy-light)); }
+  .kpi-card.green::before { background: linear-gradient(90deg, var(--green), var(--green-light)); }
+  .kpi-card.orange::before { background: linear-gradient(90deg, var(--orange), #ED8936); }
+  .kpi-card.red::before   { background: linear-gradient(90deg, var(--red), #FC8181); }
+
+  .kpi-label {
+    font-size: 10px; font-weight: 600; color: var(--gray-600);
+    text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px;
+  }
+  .kpi-value {
+    font-size: 38px; font-weight: 900; line-height: 1;
+    margin-bottom: 4px;
+  }
+  .kpi-card.blue  .kpi-value { color: var(--navy); }
+  .kpi-card.green .kpi-value { color: var(--green); }
+  .kpi-card.orange .kpi-value { color: var(--orange); }
+  .kpi-card.red   .kpi-value { color: var(--red); }
+
+  .kpi-desc {
+    font-size: 11px; color: var(--gray-400);
+  }
+  .kpi-icon {
+    position: absolute; top: 14px; left: 14px;
+    font-size: 20px; opacity: 0.12;
+  }
+
+  /* SLA CARD (wide) */
+  .sla-card {
+    background: linear-gradient(135deg, #7B1A1A 0%, #9B2335 100%);
+    border-radius: 12px;
+    padding: 18px 22px;
+    display: flex; align-items: center; gap: 20px;
+    box-shadow: 0 4px 20px rgba(200,0,0,0.2);
+    border: 1px solid rgba(255,100,100,0.2);
+  }
+  .sla-alert-icon {
+    font-size: 32px; flex-shrink: 0;
+  }
+  .sla-content { flex: 1; }
+  .sla-label {
+    font-size: 10px; font-weight: 700; letter-spacing: 1px;
+    color: rgba(255,255,255,0.6); text-transform: uppercase; margin-bottom: 4px;
+  }
+  .sla-title {
+    font-size: 16px; font-weight: 800; color: var(--white); margin-bottom: 2px;
+  }
+  .sla-sub { font-size: 12px; color: rgba(255,255,255,0.65); }
+  .sla-badge {
+    background: rgba(255,255,255,0.15);
+    border: 1px solid rgba(255,255,255,0.25);
+    border-radius: 8px;
+    padding: 10px 16px;
+    text-align: center;
+    flex-shrink: 0;
+  }
+  .sla-days { font-size: 30px; font-weight: 900; color: #FC8181; line-height: 1; }
+  .sla-days-label { font-size: 10px; color: rgba(255,255,255,0.6); }
+
+  /* CHART ROW */
+  .charts-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  .chart-card {
+    background: var(--white);
+    border-radius: 12px;
+    padding: 18px 18px 14px;
+    border: 1px solid var(--gray-200);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  }
+  .chart-card-title {
+    font-size: 12px; font-weight: 700; color: var(--navy);
+    margin-bottom: 4px;
+  }
+  .chart-card-sub {
+    font-size: 10px; color: var(--gray-400); margin-bottom: 14px;
+  }
+  .chart-container { position: relative; }
+
+  /* CONTRACTOR TABLE */
+  .table-card {
+    background: var(--white);
+    border-radius: 12px;
+    border: 1px solid var(--gray-200);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    overflow: hidden;
+  }
+  .table-header {
+    padding: 14px 18px 12px;
+    border-bottom: 1px solid var(--gray-200);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .table-title { font-size: 13px; font-weight: 700; color: var(--navy); }
+  .table-badge {
+    font-size: 10px; font-weight: 600;
+    background: rgba(11,31,58,0.07);
+    color: var(--navy);
+    padding: 3px 10px; border-radius: 20px;
+  }
+  table { width: 100%; border-collapse: collapse; }
+  thead tr { background: var(--gray-100); }
+  thead th {
+    padding: 10px 18px;
+    font-size: 10px; font-weight: 700; color: var(--gray-600);
+    text-transform: uppercase; letter-spacing: 0.5px;
+    text-align: right; white-space: nowrap;
+  }
+  tbody tr { border-bottom: 1px solid var(--gray-200); transition: background 0.15s; }
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: rgba(11,31,58,0.02); }
+  tbody td {
+    padding: 12px 18px;
+    font-size: 12px; color: var(--navy);
+  }
+  .td-name { font-weight: 700; }
+  .td-num { font-weight: 800; font-size: 14px; }
+  .td-num.high { color: var(--red); }
+  .td-num.mid  { color: var(--orange); }
+  .td-num.low  { color: var(--green); }
+  .delay-pill {
+    display: inline-block;
+    padding: 3px 9px; border-radius: 20px;
+    font-size: 11px; font-weight: 700;
+  }
+  .delay-critical { background: #FFF5F5; color: var(--red); border: 1px solid #FED7D7; }
+  .delay-warning  { background: #FFFAF0; color: var(--orange); border: 1px solid #FEEBC8; }
+  .delay-ok       { background: #F0FFF4; color: var(--green); border: 1px solid #C6F6D5; }
+
+  /* Scrollbar for dashboard */
+  .dashboard-panel::-webkit-scrollbar { width: 5px; }
+  .dashboard-panel::-webkit-scrollbar-track { background: transparent; }
+  .dashboard-panel::-webkit-scrollbar-thumb { background: var(--gray-200); border-radius: 10px; }
+
+  /* Zapier embed override */
+  zapier-interfaces-chatbot-embed {
+    --primary-color: #C9A84C !important;
+  }
+</style>
+</head>
+<body>
+
+<!-- ══════════ LOGIN OVERLAY ══════════ -->
+<div id="login-overlay">
+  <div class="login-card">
+    <div class="login-logo">Gindi Holdings</div>
+    <div class="login-deco"></div>
+    <div class="login-title">כניסה למערכת</div>
+    <div class="login-sub">AI-Agent | ניהול מסירות, בדק ונתוני קבלנים</div>
+    <label class="login-label">סיסמת גישה</label>
+    <input
+      class="login-input"
+      id="pass-input"
+      type="password"
+      placeholder="••••••••••"
+      autocomplete="current-password"
+    />
+    <button class="login-btn" onclick="doLogin()">כניסה למערכת</button>
+    <div class="login-error" id="login-error">סיסמה שגויה. אנא נסה שנית.</div>
+  </div>
+</div>
+
+<!-- ══════════ HEADER ══════════ -->
+<div class="header">
+  <div class="header-brand">
+    <div class="header-logo-box">G</div>
+    <div>
+      <div class="header-title">Gindi AI-Agent</div>
+      <div class="header-sub">מערכת ניהול מסירות, בדק ונתוני קבלנים</div>
+    </div>
+  </div>
+  <div class="header-live">
+    <div class="live-dot"></div>
+    מערכת פעילה
+  </div>
+  <div class="header-user">
+    <div class="user-badge">
+      <div class="user-name" id="display-name"></div>
+      <div class="user-role" id="display-role"></div>
+    </div>
+    <div class="user-avatar" id="display-avatar"></div>
+  </div>
+</div>
+
+<!-- ══════════ MAIN SPLIT ══════════ -->
+<div class="main">
+
+  <!-- LEFT: CHAT -->
+  <div class="chat-panel">
+    <div class="chat-header">
+      <div class="chat-header-title">
+        <div class="chat-icon">🤖</div>
+        Gindi AI Assistant
+      </div>
+      <div class="chat-header-sub">שאל כל שאלה על ליקויים, קבלנים ומצב מסירות</div>
+    </div>
+    <div class="chat-body">
+      <script async type="module" src="https://interfaces.zapier.com/assets/web-components/zapier-interfaces/zapier-interfaces.esm.js"></script>
+      <zapier-interfaces-chatbot-embed
+        is-popup="false"
+        chatbot-id="cmqt9j86j00ak71j7gc83z30m"
+        style="display:block; width:100%; height:100%;"
+      ></zapier-interfaces-chatbot-embed>
+    </div>
+  </div>
+
+  <!-- RIGHT: DASHBOARD -->
+  <div class="dashboard-panel">
+
+    <!-- KPI CARDS -->
+    <div class="kpi-grid">
+      <div class="kpi-card blue">
+        <div class="kpi-icon">📋</div>
+        <div class="kpi-label">סה"כ ליקויים שתועדו</div>
+        <div class="kpi-value">250</div>
+        <div class="kpi-desc">בפרויקט הנוכחי</div>
+      </div>
+      <div class="kpi-card green">
+        <div class="kpi-icon">✅</div>
+        <div class="kpi-label">הושלמו בהצלחה</div>
+        <div class="kpi-value">77</div>
+        <div class="kpi-desc">משימות סגורות</div>
+      </div>
+      <div class="kpi-card orange">
+        <div class="kpi-icon">⚙️</div>
+        <div class="kpi-label">בטיפול פעיל</div>
+        <div class="kpi-value">173</div>
+        <div class="kpi-desc">משימות פתוחות</div>
+      </div>
+      <div class="kpi-card red">
+        <div class="kpi-icon">📊</div>
+        <div class="kpi-label">אחוז השלמה</div>
+        <div class="kpi-value">31%</div>
+        <div class="kpi-desc">77 מתוך 250 ליקויים</div>
+      </div>
+    </div>
+
+    <!-- SLA ALERT -->
+    <div class="sla-card">
+      <div class="sla-alert-icon">⚠️</div>
+      <div class="sla-content">
+        <div class="sla-label">🔴 חריגת SLA קריטית | צוואר בקבוק</div>
+        <div class="sla-title">אלומיניום — אבי אלומיניום</div>
+        <div class="sla-sub">סך החריגה המצטברת מנוגדת ל-SLA המוגדר בחוזה. נדרשת התערבות מיידית של ראש מטה.</div>
+      </div>
+      <div class="sla-badge">
+        <div class="sla-days">444</div>
+        <div class="sla-days-label">ימי איחור</div>
+      </div>
+    </div>
+
+    <!-- CHARTS ROW -->
+    <div class="charts-row">
+      <div class="chart-card">
+        <div class="chart-card-title">חלוקת ליקויים לפי קבלן</div>
+        <div class="chart-card-sub">סה"כ 250 ליקויים מתועדים</div>
+        <div class="chart-container" style="height:160px;">
+          <canvas id="donutChart"></canvas>
+        </div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-card-title">סטטוס משימות לפי קבלן</div>
+        <div class="chart-card-sub">פתוח vs. סגור</div>
+        <div class="chart-container" style="height:160px;">
+          <canvas id="barChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- CONTRACTOR TABLE -->
+    <div class="table-card">
+      <div class="table-header">
+        <div class="table-title">פירוט קבלנים ומצב ליקויים</div>
+        <div class="table-badge">3 קבלנים פעילים</div>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>קבלן</th>
+            <th>תחום</th>
+            <th>סה"כ ליקויים</th>
+            <th>פתוחים</th>
+            <th>סגורים</th>
+            <th>חריגת SLA</th>
+            <th>סטטוס</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="td-name">אבי אלומיניום</td>
+            <td>אלומיניום וחלונות</td>
+            <td class="td-num high">142</td>
+            <td class="td-num high">115</td>
+            <td class="td-num">27</td>
+            <td><span class="delay-pill delay-critical">444 ימים</span></td>
+            <td><span class="delay-pill delay-critical">🔴 קריטי</span></td>
+          </tr>
+          <tr>
+            <td class="td-name">שמעון חשמל</td>
+            <td>חשמל ותאורה</td>
+            <td class="td-num mid">68</td>
+            <td class="td-num mid">42</td>
+            <td class="td-num">26</td>
+            <td><span class="delay-pill delay-warning">89 ימים</span></td>
+            <td><span class="delay-pill delay-warning">🟠 גבוה</span></td>
+          </tr>
+          <tr>
+            <td class="td-name">דוד אינסטלציה</td>
+            <td>אינסטלציה ואיטום</td>
+            <td class="td-num low">40</td>
+            <td class="td-num low">16</td>
+            <td class="td-num">24</td>
+            <td><span class="delay-pill delay-ok">21 ימים</span></td>
+            <td><span class="delay-pill delay-ok">🟢 תקין</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div><!-- /dashboard-panel -->
+</div><!-- /main -->
+
+<script>
+  /* ══ USERS ══ */
+  const USERS = {
+    '0526008842': { name: "ג'ונתן", role: 'סמנכ"ל טכנולוגיות' },
+    '0542464444': { name: 'רועי גינדי',  role: 'בעלים' },
+    '0544277789': { name: 'יוני אסיא',   role: 'בעלים' },
+    '0542007098': { name: 'ברק טוויזר',  role: 'ראש מטה' },
+  };
+
+  /* ── ENTER KEY ── */
+  document.getElementById('pass-input').addEventListener('keydown', e => {
+    if (e.key === 'Enter') doLogin();
+  });
+
+  function doLogin() {
+    const val = document.getElementById('pass-input').value.trim();
+    const user = USERS[val];
+    if (!user) {
+      const err = document.getElementById('login-error');
+      err.style.display = 'block';
+      document.getElementById('pass-input').value = '';
+      document.getElementById('pass-input').focus();
+      return;
+    }
+    // Set user info in header
+    document.getElementById('display-name').textContent = user.name;
+    document.getElementById('display-role').textContent = user.role;
+    document.getElementById('display-avatar').textContent = user.name.charAt(0);
+    // Hide overlay
+    document.getElementById('login-overlay').style.display = 'none';
+  }
+
+  /* ══ CHARTS ══ */
+  const FONT = 'Heebo';
+  Chart.defaults.font.family = FONT;
+
+  // Donut
+  new Chart(document.getElementById('donutChart'), {
+    type: 'doughnut',
+    data: {
+      labels: ['אבי אלומיניום', 'שמעון חשמל', 'דוד אינסטלציה'],
+      datasets: [{
+        data: [142, 68, 40],
+        backgroundColor: ['#E53E3E', '#DD6B20', '#2F855A'],
+        borderColor: '#fff',
+        borderWidth: 3,
+        hoverOffset: 6,
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      cutout: '68%',
+      plugins: {
+        legend: {
+          position: 'bottom',
+          labels: {
+            font: { family: FONT, size: 10, weight: '600' },
+            color: '#64748B',
+            boxWidth: 10, padding: 10,
+          }
+        },
+        tooltip: {
+          callbacks: {
+            label: ctx => ` ${ctx.label}: ${ctx.parsed} ליקויים`
+          }
+        }
+      }
+    }
+  });
+
+  // Bar
+  new Chart(document.getElementById('barChart'), {
+    type: 'bar',
+    data: {
+      labels: ['אבי אלומיניום', 'שמעון חשמל', 'דוד אינסטלציה'],
+      datasets: [
+        {
+          label: 'פתוח',
+          data: [115, 42, 16],
+          backgroundColor: '#E53E3E',
+          borderRadius: 4, borderSkipped: false,
+        },
+        {
+          label: 'סגור',
+          data: [27, 26, 24],
+          backgroundColor: '#2F855A',
+          borderRadius: 4, borderSkipped: false,
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          position: 'bottom',
+          labels: {
+            font: { family: FONT, size: 10, weight: '600' },
+            color: '#64748B',
+            boxWidth: 10, padding: 10,
+          }
+        }
+      },
+      scales: {
+        x: {
+          stacked: false,
+          grid: { display: false },
+          ticks: { font: { family: FONT, size: 9 }, color: '#94A3B8' }
+        },
+        y: {
+          beginAtZero: true,
+          grid: { color: 'rgba(0,0,0,0.05)' },
+          ticks: { font: { family: FONT, size: 9 }, color: '#94A3B8', stepSize: 30 }
+        }
+      }
+    }
+  });
+</script>
+</body>
+</html>
