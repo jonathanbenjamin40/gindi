@@ -3,692 +3,635 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Gindi AI-Agent | מערכת ניהול מסירות ובדק</title>
+<title>Gindi AI-Agent | פלטפורמת ניהול חכמה</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700;800;900&display=swap');
+:root{
+  --navy:#0B1F3A;--navy-mid:#122847;--navy-light:#1A3A5C;
+  --gold:#C9A84C;--gold-light:#E8C97A;
+  --white:#fff;--gray-50:#F9FAFB;--gray-100:#F4F6F9;
+  --gray-200:#E2E8F0;--gray-400:#94A3B8;--gray-600:#64748B;
+  --red:#E53E3E;--green:#2F855A;--green-light:#38A169;--orange:#DD6B20;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Heebo',sans-serif;background:var(--navy);color:var(--white);height:100vh;overflow:hidden;display:flex;flex-direction:column;}
 
-  :root {
-    --navy:       #0B1F3A;
-    --navy-mid:   #122847;
-    --navy-light: #1A3A5C;
-    --gold:       #C9A84C;
-    --gold-light: #E8C97A;
-    --white:      #FFFFFF;
-    --gray-100:   #F4F6F9;
-    --gray-200:   #E2E8F0;
-    --gray-400:   #94A3B8;
-    --gray-600:   #64748B;
-    --red:        #E53E3E;
-    --green:      #2F855A;
-    --green-light:#38A169;
-    --orange:     #DD6B20;
-  }
+/* LOGIN */
+#login-overlay{position:fixed;inset:0;background:#fff;display:flex;align-items:center;justify-content:center;z-index:9999;}
+.login-wrap{display:flex;flex-direction:column;align-items:center;width:400px;}
+.login-gindi-text{font-size:52px;font-weight:900;color:var(--gold);letter-spacing:10px;text-align:center;line-height:1;}
+.login-gindi-line{width:180px;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent);margin:8px auto 5px;}
+.login-gindi-sub{font-size:10px;font-weight:700;letter-spacing:5px;color:#bbb;text-transform:uppercase;text-align:center;margin-bottom:32px;}
+.login-card{background:#fff;border:1.5px solid #E8C97A;border-radius:20px;padding:34px 32px 26px;width:100%;box-shadow:0 8px 48px rgba(201,168,76,0.15);}
+.login-card-title{font-size:17px;font-weight:800;color:var(--navy);text-align:center;margin-bottom:3px;}
+.login-card-sub{font-size:11px;color:var(--gray-400);text-align:center;margin-bottom:22px;}
+.login-label{display:block;font-size:11px;font-weight:600;color:var(--gray-600);margin-bottom:5px;text-align:right;}
+.login-input{width:100%;background:var(--gray-50);border:1.5px solid var(--gray-200);border-radius:10px;padding:12px 16px;color:var(--navy);font-family:'Heebo',sans-serif;font-size:16px;letter-spacing:3px;margin-bottom:16px;outline:none;text-align:center;transition:border-color .2s,box-shadow .2s;}
+.login-input:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(201,168,76,0.15);}
+.login-btn{width:100%;background:linear-gradient(135deg,#C9A84C,#E8C97A);border:none;border-radius:10px;padding:13px;font-family:'Heebo',sans-serif;font-size:15px;font-weight:800;color:var(--navy);cursor:pointer;box-shadow:0 4px 16px rgba(201,168,76,0.35);transition:opacity .2s,transform .1s;}
+.login-btn:hover{opacity:.92;transform:translateY(-1px);}
+.login-error{color:var(--red);font-size:12px;margin-top:10px;display:none;background:#FFF5F5;border:1px solid #FED7D7;border-radius:8px;padding:9px;text-align:center;}
+.login-author{margin-top:20px;text-align:center;}
+.login-author-name{font-size:14px;font-weight:700;color:var(--navy);}
+.login-author-sep{width:36px;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent);margin:7px auto;}
+.login-author-co{font-size:11px;color:var(--gold);font-weight:700;letter-spacing:2px;}
 
-  * { box-sizing: border-box; margin: 0; padding: 0; }
+/* HEADER */
+.header{background:var(--navy-mid);border-bottom:1px solid rgba(201,168,76,0.25);padding:0 20px;height:52px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;box-shadow:0 2px 20px rgba(0,0,0,0.4);}
+.header-brand{display:flex;align-items:center;gap:10px;}
+.header-logo-box{width:30px;height:30px;background:linear-gradient(135deg,var(--gold),var(--gold-light));border-radius:7px;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:14px;color:var(--navy);}
+.header-title{font-size:13px;font-weight:700;color:var(--white);line-height:1.3;}
+.header-sub{font-size:10px;color:var(--gray-400);}
+.header-nav{display:flex;gap:4px;}
+.nav-btn{background:transparent;border:1px solid rgba(255,255,255,0.12);border-radius:8px;padding:5px 13px;font-family:'Heebo',sans-serif;font-size:12px;font-weight:600;color:var(--gray-400);cursor:pointer;transition:all .2s;}
+.nav-btn:hover{color:var(--white);border-color:rgba(255,255,255,0.3);}
+.nav-btn.active{background:linear-gradient(135deg,var(--gold),var(--gold-light));color:var(--navy);border-color:transparent;}
+.header-right{display:flex;align-items:center;gap:12px;}
+.header-live{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--green-light);font-weight:600;}
+.live-dot{width:6px;height:6px;border-radius:50%;background:var(--green-light);animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.8)}}
+.user-name{font-size:12px;font-weight:700;color:var(--gold);}
+.user-role{font-size:10px;color:var(--gray-400);}
+.user-avatar{width:28px;height:28px;background:linear-gradient(135deg,var(--navy-light),var(--gold));border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;border:2px solid rgba(201,168,76,0.4);}
 
-  body {
-    font-family: 'Heebo', sans-serif;
-    background: var(--navy);
-    color: var(--white);
-    height: 100vh;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-  }
+/* PAGES */
+.page{display:none;flex:1;overflow:hidden;}
+.page.active{display:flex;}
 
-  /* ── LOGIN OVERLAY ── */
-  #login-overlay {
-    position: fixed; inset: 0;
-    background: linear-gradient(135deg, var(--navy) 0%, #071428 100%);
-    display: flex; align-items: center; justify-content: center;
-    z-index: 9999;
-  }
-  .login-card {
-    background: var(--navy-mid);
-    border: 1px solid rgba(201,168,76,0.3);
-    border-radius: 16px;
-    padding: 48px 40px;
-    width: 380px;
-    box-shadow: 0 24px 80px rgba(0,0,0,0.6);
-    text-align: center;
-  }
-  .login-logo {
-    font-size: 13px; font-weight: 700; letter-spacing: 3px;
-    color: var(--gold); text-transform: uppercase; margin-bottom: 6px;
-  }
-  .login-title {
-    font-size: 22px; font-weight: 800; color: var(--white); margin-bottom: 6px;
-  }
-  .login-sub {
-    font-size: 12px; color: var(--gray-400); margin-bottom: 32px;
-  }
-  .login-label {
-    display: block; text-align: right; font-size: 12px;
-    color: var(--gray-400); margin-bottom: 6px; font-weight: 500;
-  }
-  .login-input {
-    width: 100%;
-    background: rgba(255,255,255,0.05);
-    border: 1px solid rgba(255,255,255,0.12);
-    border-radius: 8px;
-    padding: 12px 14px;
-    color: var(--white);
-    font-family: 'Heebo', sans-serif;
-    font-size: 15px;
-    letter-spacing: 2px;
-    margin-bottom: 20px;
-    outline: none;
-    text-align: center;
-    transition: border-color 0.2s;
-  }
-  .login-input:focus { border-color: var(--gold); }
-  .login-btn {
-    width: 100%;
-    background: linear-gradient(135deg, var(--gold) 0%, var(--gold-light) 100%);
-    border: none; border-radius: 8px;
-    padding: 13px;
-    font-family: 'Heebo', sans-serif;
-    font-size: 15px; font-weight: 700;
-    color: var(--navy);
-    cursor: pointer;
-    transition: opacity 0.2s, transform 0.1s;
-  }
-  .login-btn:hover { opacity: 0.9; transform: translateY(-1px); }
-  .login-btn:active { transform: translateY(0); }
-  .login-error {
-    color: #FC8181; font-size: 13px; margin-top: 12px;
-    display: none; background: rgba(229,62,62,0.1);
-    border-radius: 6px; padding: 8px;
-  }
-  .login-deco {
-    width: 48px; height: 3px;
-    background: linear-gradient(90deg, var(--gold), transparent);
-    margin: 0 auto 24px;
-    border-radius: 2px;
-  }
+/* HOME */
+#page-home{background:linear-gradient(160deg,#07111F 0%,#0E2340 60%,#07111F 100%);flex-direction:column;overflow-y:auto;align-items:center;}
+#page-home::-webkit-scrollbar{width:4px;}
+#page-home::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.1);border-radius:4px;}
+.home-inner{width:100%;max-width:900px;margin:0 auto;padding:24px 24px 60px;display:flex;flex-direction:column;align-items:center;}
+.home-eyebrow{font-size:10px;font-weight:700;letter-spacing:4px;color:var(--gold);text-transform:uppercase;text-align:center;margin-bottom:5px;}
+.home-headline{font-size:24px;font-weight:900;background:linear-gradient(135deg,#fff 0%,#E8C97A 60%,#C9A84C 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;text-align:center;margin-bottom:20px;}
+.diagram-wrap{width:660px;height:660px;position:relative;flex-shrink:0;}
+.diagram-wrap svg{width:100%;height:100%;overflow:visible;}
+.diag-legend{display:flex;flex-wrap:wrap;gap:6px 14px;justify-content:center;margin:12px 0 36px;}
+.diag-legend-item{display:flex;align-items:center;gap:5px;font-size:10px;font-weight:600;color:var(--gray-400);}
+.diag-legend-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
 
-  /* ── HEADER ── */
-  .header {
-    background: var(--navy-mid);
-    border-bottom: 1px solid rgba(201,168,76,0.25);
-    padding: 0 24px;
-    height: 60px;
-    display: flex; align-items: center; justify-content: space-between;
-    flex-shrink: 0;
-    box-shadow: 0 2px 20px rgba(0,0,0,0.4);
-  }
-  .header-brand {
-    display: flex; align-items: center; gap: 14px;
-  }
-  .header-logo-box {
-    width: 36px; height: 36px;
-    background: linear-gradient(135deg, var(--gold), var(--gold-light));
-    border-radius: 8px;
-    display: flex; align-items: center; justify-content: center;
-    font-weight: 900; font-size: 16px; color: var(--navy);
-    flex-shrink: 0;
-  }
-  .header-title {
-    font-size: 13px; font-weight: 700; color: var(--white); line-height: 1.3;
-  }
-  .header-sub {
-    font-size: 10px; color: var(--gray-400); font-weight: 400;
-  }
-  .header-user {
-    display: flex; align-items: center; gap: 10px;
-  }
-  .user-badge {
-    text-align: left;
-  }
-  .user-name {
-    font-size: 13px; font-weight: 700; color: var(--gold);
-  }
-  .user-role {
-    font-size: 10px; color: var(--gray-400);
-  }
-  .user-avatar {
-    width: 34px; height: 34px;
-    background: linear-gradient(135deg, var(--navy-light), var(--gold));
-    border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 14px; font-weight: 800; color: var(--white);
-    border: 2px solid rgba(201,168,76,0.4);
-  }
-  .header-live {
-    display: flex; align-items: center; gap: 6px;
-    font-size: 11px; color: var(--green-light); font-weight: 600;
-  }
-  .live-dot {
-    width: 7px; height: 7px; border-radius: 50%;
-    background: var(--green-light);
-    animation: pulse 2s infinite;
-  }
-  @keyframes pulse {
-    0%, 100% { opacity: 1; transform: scale(1); }
-    50% { opacity: 0.5; transform: scale(0.8); }
-  }
+/* SECTIONS */
+.section-divider{width:100%;border-top:1px solid rgba(201,168,76,0.15);margin:8px 0 32px;position:relative;}
+.section-divider::after{content:'';position:absolute;top:-1px;right:0;width:80px;height:2px;background:linear-gradient(90deg,var(--gold),transparent);}
+.section-title-wrap{width:100%;margin-bottom:20px;}
+.section-eyebrow{font-size:10px;font-weight:700;letter-spacing:3px;color:var(--gold);text-transform:uppercase;margin-bottom:4px;}
+.section-title{font-size:18px;font-weight:900;color:var(--white);}
+.section-sub{font-size:12px;color:var(--gray-400);margin-top:3px;line-height:1.6;}
 
-  /* ── MAIN SPLIT ── */
-  .main {
-    display: grid;
-    grid-template-columns: 420px 1fr;
-    gap: 0;
-    flex: 1;
-    overflow: hidden;
-  }
+/* FORM CARD */
+.form-card{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:14px;overflow:hidden;width:100%;margin-bottom:20px;}
+.form-card-header{background:linear-gradient(135deg,rgba(201,168,76,0.12),rgba(201,168,76,0.05));border-bottom:1px solid rgba(201,168,76,0.2);padding:14px 20px;display:flex;align-items:center;justify-content:space-between;}
+.form-card-title{font-size:13px;font-weight:800;color:var(--white);}
+.form-card-badge{font-size:10px;font-weight:700;color:var(--gold);background:rgba(201,168,76,0.12);border:1px solid rgba(201,168,76,0.25);padding:3px 10px;border-radius:20px;}
+.form-body{padding:20px;}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;}
+.form-row-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:12px;}
+.field-group{display:flex;flex-direction:column;gap:5px;}
+.field-label{font-size:10px;font-weight:700;color:var(--gray-400);letter-spacing:.5px;text-transform:uppercase;}
+.field-value{background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:9px 12px;font-size:12px;color:var(--white);font-weight:500;}
+.field-value.highlight{border-color:rgba(201,168,76,0.3);color:var(--gold-light);}
+.field-value.placeholder{color:var(--gray-600);font-style:italic;}
+.defect-table{width:100%;border-collapse:collapse;margin-bottom:16px;}
+.defect-table thead tr{background:rgba(255,255,255,0.04);}
+.defect-table th{padding:9px 12px;font-size:10px;font-weight:700;color:var(--gray-400);text-transform:uppercase;letter-spacing:.5px;text-align:right;border-bottom:1px solid rgba(255,255,255,0.08);}
+.defect-table td{padding:10px 12px;font-size:11px;color:var(--white);border-bottom:1px solid rgba(255,255,255,0.05);}
+.defect-table tr:last-child td{border-bottom:none;}
+.badge-open{background:rgba(229,62,62,0.15);color:#FC8181;border:1px solid rgba(229,62,62,0.3);padding:2px 8px;border-radius:12px;font-size:10px;font-weight:700;}
+.badge-urgent{background:rgba(221,107,32,0.15);color:#FBD38D;border:1px solid rgba(221,107,32,0.3);padding:2px 8px;border-radius:12px;font-size:10px;font-weight:700;}
+.badge-cat{padding:2px 8px;border-radius:12px;font-size:10px;font-weight:700;}
+.badge-alu{background:rgba(37,99,235,0.15);color:#93C5FD;border:1px solid rgba(37,99,235,0.3);}
+.badge-ele{background:rgba(234,179,8,0.12);color:#FDE68A;border:1px solid rgba(234,179,8,0.3);}
+.badge-plu{background:rgba(13,148,136,0.15);color:#5EEAD4;border:1px solid rgba(13,148,136,0.3);}
+.sig-area{border:1.5px dashed rgba(201,168,76,0.3);border-radius:10px;height:70px;display:flex;align-items:center;justify-content:center;color:var(--gray-600);font-size:11px;font-weight:600;margin-bottom:14px;background:rgba(201,168,76,0.02);}
+.form-footer{display:flex;gap:10px;justify-content:flex-end;}
+.btn-primary{background:linear-gradient(135deg,var(--gold),var(--gold-light));color:var(--navy);border:none;border-radius:8px;padding:9px 22px;font-family:'Heebo',sans-serif;font-size:12px;font-weight:800;cursor:pointer;}
+.btn-secondary{background:transparent;color:var(--gray-400);border:1px solid rgba(255,255,255,0.15);border-radius:8px;padding:9px 18px;font-family:'Heebo',sans-serif;font-size:12px;font-weight:600;cursor:pointer;}
+.upload-zone{border:1.5px dashed rgba(13,148,136,0.4);border-radius:10px;height:80px;display:flex;align-items:center;justify-content:center;gap:10px;color:#5EEAD4;font-size:12px;font-weight:600;margin-bottom:12px;background:rgba(13,148,136,0.04);}
 
-  /* ── LEFT: CHAT ── */
-  .chat-panel {
-    background: var(--navy-mid);
-    border-left: 1px solid rgba(255,255,255,0.06);
-    display: flex; flex-direction: column;
-    overflow: hidden;
-  }
-  .chat-header {
-    padding: 14px 18px 12px;
-    border-bottom: 1px solid rgba(255,255,255,0.07);
-    background: rgba(255,255,255,0.02);
-    flex-shrink: 0;
-  }
-  .chat-header-title {
-    font-size: 13px; font-weight: 700; color: var(--white);
-    display: flex; align-items: center; gap: 8px;
-  }
-  .chat-icon {
-    width: 24px; height: 24px;
-    background: linear-gradient(135deg, var(--gold), var(--gold-light));
-    border-radius: 6px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 12px;
-  }
-  .chat-header-sub {
-    font-size: 10px; color: var(--gray-400); margin-top: 2px;
-  }
-  .chat-body {
-    flex: 1;
-    overflow: hidden;
-    padding: 0;
-    position: relative;
-  }
-  .chat-body zapier-interfaces-chatbot-embed {
-    position: absolute;
-    inset: 0;
-    width: 100% !important;
-    height: 100% !important;
-    display: block;
-  }
+/* WHATSAPP */
+.wa-thread{display:flex;flex-direction:column;gap:10px;margin-bottom:16px;}
+.wa-msg{max-width:75%;display:flex;flex-direction:column;gap:3px;}
+.wa-msg.sent{align-self:flex-end;align-items:flex-end;}
+.wa-msg.recv{align-self:flex-start;align-items:flex-start;}
+.wa-bubble{padding:10px 14px;border-radius:14px;font-size:12px;line-height:1.55;font-weight:500;}
+.wa-msg.sent .wa-bubble{background:#1F5C2E;color:#E7FBE6;border-radius:14px 14px 4px 14px;}
+.wa-msg.recv .wa-bubble{background:#1E2A3A;color:#E2E8F0;border:1px solid rgba(255,255,255,0.08);border-radius:14px 14px 14px 4px;}
+.wa-msg.system .wa-bubble{background:rgba(201,168,76,0.1);color:var(--gold-light);border:1px solid rgba(201,168,76,0.2);border-radius:10px;font-size:11px;}
+.wa-msg.system{align-self:center;align-items:center;}
+.wa-time{font-size:9px;color:var(--gray-600);}
+.wa-sender-tag{display:inline-flex;align-items:center;gap:4px;font-size:9px;font-weight:700;padding:2px 7px;border-radius:10px;margin-bottom:3px;}
+.tag-contractor{background:rgba(37,99,235,0.15);color:#93C5FD;}
+.tag-client{background:rgba(219,39,119,0.15);color:#F9A8D4;}
+.tag-ai{background:rgba(201,168,76,0.15);color:#E8C97A;}
+.tag-manager{background:rgba(13,148,136,0.15);color:#5EEAD4;}
+.wa-section-label{font-size:11px;font-weight:700;color:var(--gray-400);letter-spacing:1px;text-transform:uppercase;margin:18px 0 8px;display:flex;align-items:center;gap:8px;}
+.wa-section-label::after{content:'';flex:1;height:1px;background:rgba(255,255,255,0.07);}
 
-  /* ── RIGHT: DASHBOARD ── */
-  .dashboard-panel {
-    background: var(--gray-100);
-    overflow-y: auto;
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-  }
-
-  /* KPI CARDS */
-  .kpi-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 12px;
-  }
-  .kpi-card {
-    background: var(--white);
-    border-radius: 12px;
-    padding: 18px 16px 14px;
-    border: 1px solid var(--gray-200);
-    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-    position: relative;
-    overflow: hidden;
-  }
-  .kpi-card::before {
-    content: '';
-    position: absolute; top: 0; right: 0; left: 0;
-    height: 3px;
-  }
-  .kpi-card.blue::before  { background: linear-gradient(90deg, var(--navy), var(--navy-light)); }
-  .kpi-card.green::before { background: linear-gradient(90deg, var(--green), var(--green-light)); }
-  .kpi-card.orange::before { background: linear-gradient(90deg, var(--orange), #ED8936); }
-  .kpi-card.red::before   { background: linear-gradient(90deg, var(--red), #FC8181); }
-
-  .kpi-label {
-    font-size: 10px; font-weight: 600; color: var(--gray-600);
-    text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px;
-  }
-  .kpi-value {
-    font-size: 38px; font-weight: 900; line-height: 1;
-    margin-bottom: 4px;
-  }
-  .kpi-card.blue  .kpi-value { color: var(--navy); }
-  .kpi-card.green .kpi-value { color: var(--green); }
-  .kpi-card.orange .kpi-value { color: var(--orange); }
-  .kpi-card.red   .kpi-value { color: var(--red); }
-
-  .kpi-desc {
-    font-size: 11px; color: var(--gray-400);
-  }
-  .kpi-icon {
-    position: absolute; top: 14px; left: 14px;
-    font-size: 20px; opacity: 0.12;
-  }
-
-  /* SLA CARD (wide) */
-  .sla-card {
-    background: linear-gradient(135deg, #7B1A1A 0%, #9B2335 100%);
-    border-radius: 12px;
-    padding: 18px 22px;
-    display: flex; align-items: center; gap: 20px;
-    box-shadow: 0 4px 20px rgba(200,0,0,0.2);
-    border: 1px solid rgba(255,100,100,0.2);
-  }
-  .sla-alert-icon {
-    font-size: 32px; flex-shrink: 0;
-  }
-  .sla-content { flex: 1; }
-  .sla-label {
-    font-size: 10px; font-weight: 700; letter-spacing: 1px;
-    color: rgba(255,255,255,0.6); text-transform: uppercase; margin-bottom: 4px;
-  }
-  .sla-title {
-    font-size: 16px; font-weight: 800; color: var(--white); margin-bottom: 2px;
-  }
-  .sla-sub { font-size: 12px; color: rgba(255,255,255,0.65); }
-  .sla-badge {
-    background: rgba(255,255,255,0.15);
-    border: 1px solid rgba(255,255,255,0.25);
-    border-radius: 8px;
-    padding: 10px 16px;
-    text-align: center;
-    flex-shrink: 0;
-  }
-  .sla-days { font-size: 30px; font-weight: 900; color: #FC8181; line-height: 1; }
-  .sla-days-label { font-size: 10px; color: rgba(255,255,255,0.6); }
-
-  /* CHART ROW */
-  .charts-row {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
-  }
-  .chart-card {
-    background: var(--white);
-    border-radius: 12px;
-    padding: 18px 18px 14px;
-    border: 1px solid var(--gray-200);
-    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-  }
-  .chart-card-title {
-    font-size: 12px; font-weight: 700; color: var(--navy);
-    margin-bottom: 4px;
-  }
-  .chart-card-sub {
-    font-size: 10px; color: var(--gray-400); margin-bottom: 14px;
-  }
-  .chart-container { position: relative; }
-
-  /* CONTRACTOR TABLE */
-  .table-card {
-    background: var(--white);
-    border-radius: 12px;
-    border: 1px solid var(--gray-200);
-    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-    overflow: hidden;
-  }
-  .table-header {
-    padding: 14px 18px 12px;
-    border-bottom: 1px solid var(--gray-200);
-    display: flex; align-items: center; justify-content: space-between;
-  }
-  .table-title { font-size: 13px; font-weight: 700; color: var(--navy); }
-  .table-badge {
-    font-size: 10px; font-weight: 600;
-    background: rgba(11,31,58,0.07);
-    color: var(--navy);
-    padding: 3px 10px; border-radius: 20px;
-  }
-  table { width: 100%; border-collapse: collapse; }
-  thead tr { background: var(--gray-100); }
-  thead th {
-    padding: 10px 18px;
-    font-size: 10px; font-weight: 700; color: var(--gray-600);
-    text-transform: uppercase; letter-spacing: 0.5px;
-    text-align: right; white-space: nowrap;
-  }
-  tbody tr { border-bottom: 1px solid var(--gray-200); transition: background 0.15s; }
-  tbody tr:last-child { border-bottom: none; }
-  tbody tr:hover { background: rgba(11,31,58,0.02); }
-  tbody td {
-    padding: 12px 18px;
-    font-size: 12px; color: var(--navy);
-  }
-  .td-name { font-weight: 700; }
-  .td-num { font-weight: 800; font-size: 14px; }
-  .td-num.high { color: var(--red); }
-  .td-num.mid  { color: var(--orange); }
-  .td-num.low  { color: var(--green); }
-  .delay-pill {
-    display: inline-block;
-    padding: 3px 9px; border-radius: 20px;
-    font-size: 11px; font-weight: 700;
-  }
-  .delay-critical { background: #FFF5F5; color: var(--red); border: 1px solid #FED7D7; }
-  .delay-warning  { background: #FFFAF0; color: var(--orange); border: 1px solid #FEEBC8; }
-  .delay-ok       { background: #F0FFF4; color: var(--green); border: 1px solid #C6F6D5; }
-
-  /* Scrollbar for dashboard */
-  .dashboard-panel::-webkit-scrollbar { width: 5px; }
-  .dashboard-panel::-webkit-scrollbar-track { background: transparent; }
-  .dashboard-panel::-webkit-scrollbar-thumb { background: var(--gray-200); border-radius: 10px; }
-
-  /* Zapier embed override */
-  zapier-interfaces-chatbot-embed {
-    --primary-color: #C9A84C !important;
-  }
+/* DASHBOARD PAGE */
+#page-dashboard{display:none;}
+#page-dashboard.active{display:grid;grid-template-columns:420px 1fr;}
+.chat-panel{background:var(--navy-mid);border-left:1px solid rgba(255,255,255,0.06);display:flex;flex-direction:column;overflow:hidden;}
+.chat-header{padding:12px 16px 10px;border-bottom:1px solid rgba(255,255,255,0.07);background:rgba(255,255,255,0.02);flex-shrink:0;}
+.chat-header-title{font-size:13px;font-weight:700;color:var(--white);display:flex;align-items:center;gap:8px;}
+.chat-icon{width:22px;height:22px;background:linear-gradient(135deg,var(--gold),var(--gold-light));border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:11px;}
+.chat-header-sub{font-size:10px;color:var(--gray-400);margin-top:2px;}
+.chat-body{flex:1;overflow:hidden;position:relative;}
+.chat-body zapier-interfaces-chatbot-embed{position:absolute;inset:0;width:100%!important;height:100%!important;display:block;}
+.dashboard-panel{background:var(--gray-100);overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:12px;}
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;}
+.kpi-card{background:#fff;border-radius:10px;padding:14px 12px 10px;border:1px solid var(--gray-200);box-shadow:0 2px 8px rgba(0,0,0,0.05);position:relative;overflow:hidden;}
+.kpi-card::before{content:'';position:absolute;top:0;right:0;left:0;height:3px;}
+.kpi-card.blue::before{background:linear-gradient(90deg,var(--navy),var(--navy-light));}
+.kpi-card.green::before{background:linear-gradient(90deg,var(--green),var(--green-light));}
+.kpi-card.orange::before{background:linear-gradient(90deg,var(--orange),#ED8936);}
+.kpi-card.red::before{background:linear-gradient(90deg,var(--red),#FC8181);}
+.kpi-label{font-size:10px;font-weight:600;color:var(--gray-600);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px;}
+.kpi-value{font-size:32px;font-weight:900;line-height:1;margin-bottom:2px;}
+.kpi-card.blue .kpi-value{color:var(--navy);}
+.kpi-card.green .kpi-value{color:var(--green);}
+.kpi-card.orange .kpi-value{color:var(--orange);}
+.kpi-card.red .kpi-value{color:var(--red);}
+.kpi-desc{font-size:10px;color:var(--gray-400);}
+.sla-card{background:linear-gradient(135deg,#7B1A1A,#9B2335);border-radius:10px;padding:12px 16px;display:flex;align-items:center;gap:14px;box-shadow:0 4px 20px rgba(200,0,0,0.2);border:1px solid rgba(255,100,100,0.2);}
+.sla-content{flex:1;}
+.sla-label{font-size:10px;font-weight:700;letter-spacing:1px;color:rgba(255,255,255,0.6);text-transform:uppercase;margin-bottom:2px;}
+.sla-title{font-size:14px;font-weight:800;color:#fff;margin-bottom:2px;}
+.sla-sub{font-size:11px;color:rgba(255,255,255,0.6);}
+.sla-badge{background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.2);border-radius:8px;padding:7px 12px;text-align:center;flex-shrink:0;}
+.sla-days{font-size:24px;font-weight:900;color:#FC8181;line-height:1;}
+.sla-days-label{font-size:10px;color:rgba(255,255,255,0.6);}
+.charts-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.chart-card{background:#fff;border-radius:10px;padding:12px 14px 10px;border:1px solid var(--gray-200);box-shadow:0 2px 8px rgba(0,0,0,0.05);}
+.chart-card-title{font-size:12px;font-weight:700;color:var(--navy);margin-bottom:2px;}
+.chart-card-sub{font-size:10px;color:var(--gray-400);margin-bottom:10px;}
+.table-card{background:#fff;border-radius:10px;border:1px solid var(--gray-200);box-shadow:0 2px 8px rgba(0,0,0,0.05);overflow:hidden;}
+.table-header{padding:10px 14px;border-bottom:1px solid var(--gray-200);display:flex;align-items:center;justify-content:space-between;}
+.table-title{font-size:12px;font-weight:700;color:var(--navy);}
+.table-badge{font-size:10px;font-weight:600;background:rgba(11,31,58,0.07);color:var(--navy);padding:3px 10px;border-radius:20px;}
+table{width:100%;border-collapse:collapse;}
+thead tr{background:var(--gray-100);}
+thead th{padding:8px 12px;font-size:10px;font-weight:700;color:var(--gray-600);text-transform:uppercase;letter-spacing:.5px;text-align:right;white-space:nowrap;}
+tbody tr{border-bottom:1px solid var(--gray-200);}
+tbody tr:last-child{border-bottom:none;}
+tbody td{padding:9px 12px;font-size:12px;color:var(--navy);}
+.td-name{font-weight:700;}
+.td-num{font-weight:800;font-size:13px;}
+.td-num.high{color:var(--red);}
+.td-num.mid{color:var(--orange);}
+.td-num.low{color:var(--green);}
+.delay-pill{display:inline-block;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:700;}
+.delay-critical{background:#FFF5F5;color:var(--red);border:1px solid #FED7D7;}
+.delay-warning{background:#FFFAF0;color:var(--orange);border:1px solid #FEEBC8;}
+.delay-ok{background:#F0FFF4;color:var(--green);border:1px solid #C6F6D5;}
+.dashboard-panel::-webkit-scrollbar{width:4px;}
+.dashboard-panel::-webkit-scrollbar-thumb{background:var(--gray-200);border-radius:4px;}
 </style>
 </head>
 <body>
 
-<!-- ══════════ LOGIN OVERLAY ══════════ -->
+<!-- LOGIN -->
 <div id="login-overlay">
-  <div class="login-card">
-    <div class="login-logo">Gindi Holdings</div>
-    <div class="login-deco"></div>
-    <div class="login-title">כניסה למערכת</div>
-    <div class="login-sub">AI-Agent | ניהול מסירות, בדק ונתוני קבלנים</div>
-    <label class="login-label">סיסמת גישה</label>
-    <input
-      class="login-input"
-      id="pass-input"
-      type="password"
-      placeholder="••••••••••"
-      autocomplete="current-password"
-    />
-    <button class="login-btn" onclick="doLogin()">כניסה למערכת</button>
-    <div class="login-error" id="login-error">סיסמה שגויה. אנא נסה שנית.</div>
+  <div class="login-wrap">
+    <div class="login-gindi-text">GINDI</div>
+    <div class="login-gindi-line"></div>
+    <div class="login-gindi-sub">AI-Powered Real Estate Platform</div>
+    <div class="login-card">
+      <div class="login-card-title">כניסה למערכת</div>
+      <div class="login-card-sub">מערכת ניהול מסירות, בדק ונתוני קבלנים</div>
+      <label class="login-label">סיסמת גישה</label>
+      <input class="login-input" id="pass-input" type="password" placeholder="••••••••••" autocomplete="current-password"/>
+      <button class="login-btn" onclick="doLogin()">כניסה למערכת</button>
+      <div class="login-error" id="login-error">סיסמה שגויה. אנא נסה שנית.</div>
+    </div>
+    <div class="login-author">
+      <div class="login-author-name">Jonathan Benjamin</div>
+      <div class="login-author-sep"></div>
+      <div class="login-author-co">CHIEF CXO</div>
+    </div>
   </div>
 </div>
 
-<!-- ══════════ HEADER ══════════ -->
+<!-- HEADER -->
 <div class="header">
   <div class="header-brand">
     <div class="header-logo-box">G</div>
     <div>
       <div class="header-title">Gindi AI-Agent</div>
-      <div class="header-sub">מערכת ניהול מסירות, בדק ונתוני קבלנים</div>
+      <div class="header-sub">פלטפורמת ניהול נדל"ן חכמה</div>
     </div>
   </div>
-  <div class="header-live">
-    <div class="live-dot"></div>
-    מערכת פעילה
+  <div class="header-nav">
+    <button class="nav-btn active" onclick="showPage('home',this)">פלטפורמה</button>
+    <button class="nav-btn" onclick="showPage('dashboard',this)">דשבורד מסירות</button>
   </div>
-  <div class="header-user">
-    <div class="user-badge">
-      <div class="user-name" id="display-name"></div>
-      <div class="user-role" id="display-role"></div>
+  <div class="header-right">
+    <div class="header-live"><div class="live-dot"></div>מערכת פעילה</div>
+    <div style="display:flex;align-items:center;gap:8px;">
+      <div><div class="user-name" id="display-name"></div><div class="user-role" id="display-role"></div></div>
+      <div class="user-avatar" id="display-avatar"></div>
     </div>
-    <div class="user-avatar" id="display-avatar"></div>
   </div>
 </div>
 
-<!-- ══════════ MAIN SPLIT ══════════ -->
-<div class="main">
+<!-- HOME PAGE -->
+<div class="page active" id="page-home">
+<div class="home-inner">
+  <div class="home-eyebrow">Powered by AI &middot; Built for Real Estate</div>
+  <div class="home-headline">ארכיטקטורת הפתרון &mdash; Gindi AI Platform</div>
 
-  <!-- LEFT: CHAT -->
+  <div class="diagram-wrap">
+    <svg id="mainDiagram" viewBox="0 0 660 660" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <marker id="arr" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
+          <polygon points="0 0,6 3,0 6" fill="rgba(255,255,255,0.3)"/>
+        </marker>
+      </defs>
+    </svg>
+  </div>
+
+  <div class="diag-legend">
+    <div class="diag-legend-item"><div class="diag-legend-dot" style="background:#8B5CF6;"></div>אוטומציות עסקיות</div>
+    <div class="diag-legend-item"><div class="diag-legend-dot" style="background:#F59E0B;"></div>AI / התראות / WhatsApp</div>
+    <div class="diag-legend-item"><div class="diag-legend-dot" style="background:#3B82F6;"></div>SAP B1 / API</div>
+    <div class="diag-legend-item"><div class="diag-legend-dot" style="background:#EC4899;"></div>CRM</div>
+    <div class="diag-legend-item"><div class="diag-legend-dot" style="background:#14B8A6;"></div>נכסים / טפסים</div>
+    <div class="diag-legend-item"><div class="diag-legend-dot" style="background:#F97316;"></div>תהליך מסירה — 12 שלבים</div>
+  </div>
+
+  <div class="section-divider"></div>
+
+  <!-- FORM 1: Customer signature -->
+  <div class="section-title-wrap">
+    <div class="section-eyebrow">טופס דיגיטלי 1 / 3</div>
+    <div class="section-title">דוח ליקויים — חתימת דייר</div>
+    <div class="section-sub">נשלח ללקוח לאחר ביצוע סיור מסירה. הלקוח מאשר את ממצאי הדוח ומאשר קבלת הדירה בכפוף לטיפול בליקויים.</div>
+  </div>
+  <div class="form-card">
+    <div class="form-card-header">
+      <div class="form-card-title">דוח מסירה ואישור ליקויים — חתימת דייר</div>
+      <div class="form-card-badge">GINDI DIGITAL FORMS</div>
+    </div>
+    <div class="form-body">
+      <div class="form-row">
+        <div class="field-group"><div class="field-label">שם מלא</div><div class="field-value highlight">ישראל ישראלי</div></div>
+        <div class="field-group"><div class="field-label">טלפון דייר</div><div class="field-value highlight">050-1234567</div></div>
+      </div>
+      <div class="form-row-3">
+        <div class="field-group"><div class="field-label">פרויקט</div><div class="field-value highlight">גינדי סיטי — שלב ב</div></div>
+        <div class="field-group"><div class="field-label">מספר דירה</div><div class="field-value highlight">47</div></div>
+        <div class="field-group"><div class="field-label">כתובת</div><div class="field-value highlight">הרצל 12, תל אביב</div></div>
+      </div>
+      <div class="form-row">
+        <div class="field-group"><div class="field-label">תאריך סיור מסירה</div><div class="field-value">15/06/2025</div></div>
+        <div class="field-group"><div class="field-label">מנהל פרויקט</div><div class="field-value">ברק טוויזר</div></div>
+      </div>
+      <div class="field-label" style="margin-bottom:8px;">ממצאי ביקורת — ליקויים שתועדו</div>
+      <table class="defect-table">
+        <thead><tr><th>#</th><th>תיאור הליקוי</th><th>מיקום</th><th>קטגוריה</th><th>דחיפות</th><th>תאריך סיום מבוקש</th></tr></thead>
+        <tbody>
+          <tr><td>1</td><td>חלון לא נסגר — צד ימין</td><td>סלון</td><td><span class="badge-cat badge-alu">אלומיניום</span></td><td><span class="badge-urgent">דחוף</span></td><td>30/06/2025</td></tr>
+          <tr><td>2</td><td>נזילה בברז כיור</td><td>מטבח</td><td><span class="badge-cat badge-plu">אינסטלציה</span></td><td><span class="badge-open">רגיל</span></td><td>15/07/2025</td></tr>
+          <tr><td>3</td><td>שקע חשמל לא פעיל</td><td>חדר שינה 1</td><td><span class="badge-cat badge-ele">חשמל</span></td><td><span class="badge-urgent">דחוף</span></td><td>25/06/2025</td></tr>
+          <tr><td>4</td><td>סדק בריצוף</td><td>מרפסת</td><td><span class="badge-cat badge-plu">אינסטלציה</span></td><td><span class="badge-open">רגיל</span></td><td>20/07/2025</td></tr>
+        </tbody>
+      </table>
+      <div class="field-group" style="margin-bottom:14px;"><div class="field-label">הערות דייר</div><div class="field-value placeholder">מקום לרשום הערות...</div></div>
+      <div class="sig-area">לחץ/י כאן לחתימה דיגיטלית</div>
+      <div class="form-footer">
+        <button class="btn-secondary">שמירת טיוטה</button>
+        <button class="btn-primary">אישור וחתימה</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-divider"></div>
+
+  <!-- FORM 2: Contractor report -->
+  <div class="section-title-wrap">
+    <div class="section-eyebrow">טופס דיגיטלי 2 / 3</div>
+    <div class="section-title">דוח ליקויים לקבלן מבצע — לפי סוג קבלן</div>
+    <div class="section-sub">נשלח אוטומטית לכל קבלן עם ליקויים בתחומו בלבד. כולל פרטי לקוח, מיקום ותאריך יעד לסיום.</div>
+  </div>
+  <div class="form-card">
+    <div class="form-card-header">
+      <div class="form-card-title">דוח ביצוע — אבי אלומיניום | דירה 47</div>
+      <div class="form-card-badge" style="background:rgba(37,99,235,0.15);color:#93C5FD;border-color:rgba(37,99,235,0.3);">אלומיניום וחלונות</div>
+    </div>
+    <div class="form-body">
+      <div class="form-row-3">
+        <div class="field-group"><div class="field-label">פרויקט</div><div class="field-value highlight">גינדי סיטי — שלב ב</div></div>
+        <div class="field-group"><div class="field-label">דירה</div><div class="field-value highlight">47</div></div>
+        <div class="field-group"><div class="field-label">כתובת</div><div class="field-value highlight">הרצל 12, תל אביב</div></div>
+      </div>
+      <div class="form-row">
+        <div class="field-group"><div class="field-label">שם הדייר</div><div class="field-value">ישראל ישראלי</div></div>
+        <div class="field-group"><div class="field-label">טלפון דייר לתיאום</div><div class="field-value highlight">050-1234567</div></div>
+      </div>
+      <div class="form-row">
+        <div class="field-group"><div class="field-label">מנהל פרויקט</div><div class="field-value">ברק טוויזר</div></div>
+        <div class="field-group"><div class="field-label">תאריך יעד לסיום</div><div class="field-value" style="color:#FC8181;font-weight:700;border-color:rgba(229,62,62,0.3);">30/06/2025</div></div>
+      </div>
+      <div class="field-label" style="margin-bottom:8px;">ליקויים לטיפולך — אלומיניום בלבד</div>
+      <table class="defect-table">
+        <thead><tr><th>#</th><th>תיאור הליקוי</th><th>מיקום</th><th>דחיפות</th><th>תאריך סיום מבוקש</th><th>סטטוס</th></tr></thead>
+        <tbody>
+          <tr><td>1</td><td>חלון לא נסגר — צד ימין</td><td>סלון</td><td><span class="badge-urgent">דחוף</span></td><td>30/06/2025</td><td><span class="badge-open">פתוח</span></td></tr>
+          <tr><td>2</td><td>פגם בגימור מסגרת חלון</td><td>חדר שינה 2</td><td><span class="badge-open">רגיל</span></td><td>10/07/2025</td><td><span class="badge-open">פתוח</span></td></tr>
+        </tbody>
+      </table>
+      <div class="form-footer"><button class="btn-primary">קיבלתי לטיפול</button></div>
+    </div>
+  </div>
+
+  <div class="section-divider"></div>
+
+  <!-- FORM 3: Execution report -->
+  <div class="section-title-wrap">
+    <div class="section-eyebrow">טופס דיגיטלי 3 / 3</div>
+    <div class="section-title">טופס דיווח ביצוע קבלן + העלאת תמונות</div>
+    <div class="section-sub">הקבלן מדווח על ביצוע כל ליקוי בנפרד ומצרף תמונות הוכחה. הדיווח מועבר אוטומטית למנהל הפרויקט לאישור.</div>
+  </div>
+  <div class="form-card">
+    <div class="form-card-header">
+      <div class="form-card-title">דיווח ביצוע — אבי אלומיניום</div>
+      <div class="form-card-badge" style="background:rgba(13,148,136,0.15);color:#5EEAD4;border-color:rgba(13,148,136,0.3);">טופס קבלן</div>
+    </div>
+    <div class="form-body">
+      <div class="form-row">
+        <div class="field-group"><div class="field-label">קבלן מבצע</div><div class="field-value">אבי אלומיניום</div></div>
+        <div class="field-group"><div class="field-label">תאריך ביצוע</div><div class="field-value placeholder">בחר תאריך...</div></div>
+      </div>
+      <div class="field-group" style="margin-bottom:12px;"><div class="field-label">ליקוי מטופל</div><div class="field-value highlight">1 — חלון לא נסגר — צד ימין | סלון</div></div>
+      <div class="field-group" style="margin-bottom:12px;"><div class="field-label">תיאור הטיפול שבוצע</div><div class="field-value placeholder">פרט את הפעולה שבוצעה...</div></div>
+      <div class="field-label" style="margin-bottom:6px;">תמונות לפני ואחרי — העלה הוכחות ביצוע</div>
+      <div class="upload-zone">
+        <span style="font-size:22px;">+</span>
+        <div>
+          <div style="font-size:12px;font-weight:700;color:#5EEAD4;">גרור תמונות לכאן או לחץ להעלאה</div>
+          <div style="font-size:10px;color:var(--gray-600);margin-top:2px;">PNG, JPG עד 10MB — מינימום 2 תמונות (לפני + אחרי)</div>
+        </div>
+      </div>
+      <div class="form-row-3" style="margin-bottom:14px;">
+        <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:8px;height:70px;display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--gray-600);">לפני ביצוע</div>
+        <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:8px;height:70px;display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--gray-600);">במהלך</div>
+        <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:8px;height:70px;display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--gray-600);">אחרי ביצוע</div>
+      </div>
+      <div class="field-group" style="margin-bottom:14px;"><div class="field-label">הערות נוספות</div><div class="field-value placeholder">הערות לגבי הביצוע...</div></div>
+      <div class="form-footer">
+        <button class="btn-secondary">שמור טיוטה</button>
+        <button class="btn-primary">שלח דיווח למנהל פרויקט</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-divider"></div>
+
+  <!-- WHATSAPP SECTION -->
+  <div class="section-title-wrap">
+    <div class="section-eyebrow">אוטומציות תקשורת</div>
+    <div class="section-title">הודעות WhatsApp — קבלן, לקוח, מנהל פרויקט, AI</div>
+    <div class="section-sub">כל ההודעות נשלחות אוטומטית על ידי מערכת ה-CRM ו-AI Agent בהתאם לאירועים בשטח — ללא צורך בהתערבות ידנית.</div>
+  </div>
+  <div class="form-card">
+    <div class="form-card-header">
+      <div class="form-card-title">WhatsApp Business — שיחה אוטומטית לדוגמה</div>
+      <div class="form-card-badge" style="background:rgba(37,211,102,0.12);color:#4ADE80;border-color:rgba(37,211,102,0.3);">Live Automation</div>
+    </div>
+    <div class="form-body">
+      <div class="wa-section-label">הקצאה ראשונית לקבלן</div>
+      <div class="wa-thread">
+        <div class="wa-msg recv">
+          <div class="wa-sender-tag tag-ai">Gindi AI System</div>
+          <div class="wa-bubble">שלום אבי!<br>נפתח עבורך תיק ליקויים חדש לדירה <strong>47</strong> בפרויקט גינדי סיטי שלב ב.<br><br>2 ליקויים בתחום האלומיניום ממתינים לטיפולך.<br>תאריך יעד: <strong>30/06/2025</strong><br><br>לצפייה בדוח המלא ולאישור קבלה:<br>gindi.ai/task/ALU-047</div>
+          <div class="wa-time">09:14</div>
+        </div>
+        <div class="wa-msg sent">
+          <div class="wa-sender-tag tag-contractor">אבי אלומיניום</div>
+          <div class="wa-bubble">קיבלתי, אתאם עם הדייר להגעה השבוע</div>
+          <div class="wa-time">09:22</div>
+        </div>
+      </div>
+      <div class="wa-section-label">עדכון ללקוח לאחר תיאום</div>
+      <div class="wa-thread">
+        <div class="wa-msg recv">
+          <div class="wa-sender-tag tag-ai">Gindi AI System</div>
+          <div class="wa-bubble">שלום ישראל!<br>קבלן האלומיניום יגיע לדירתך בתאריך <strong>24/06/2025</strong> בין השעות <strong>09:00–12:00</strong>.<br><br>אנא אשר זמינות:<br>כן, מאשר / לא מתאים לי</div>
+          <div class="wa-time">10:05</div>
+        </div>
+        <div class="wa-msg sent">
+          <div class="wa-sender-tag tag-client">ישראל ישראלי</div>
+          <div class="wa-bubble">מאשר, תודה</div>
+          <div class="wa-time">10:18</div>
+        </div>
+      </div>
+      <div class="wa-section-label">התראת חריגה — AI Agent למנהל פרויקט</div>
+      <div class="wa-thread">
+        <div class="wa-msg system">
+          <div class="wa-bubble" style="text-align:center;max-width:500px;">
+            <strong>התראת SLA — Gindi AI Agent</strong><br><br>
+            קבלן <strong>אבי אלומיניום</strong> חרג מתאריך הסיום המוגדר.<br>
+            דירה 47 | ליקוי 1 — חלון סלון<br>
+            תאריך יעד: 30/06/2025 | היום: 02/07/2025<br>
+            <strong>חריגה: 2 ימים</strong><br><br>
+            gindi.ai/sla/047
+          </div>
+          <div class="wa-time">07:00 — שליחה אוטומטית</div>
+        </div>
+        <div class="wa-msg sent">
+          <div class="wa-sender-tag tag-manager">ברק טוויזר</div>
+          <div class="wa-bubble">קיבלתי, אתקשר לאבי עכשיו ואעדכן.</div>
+          <div class="wa-time">07:34</div>
+        </div>
+      </div>
+      <div class="wa-section-label">הודעת סיום — אישור לקוח</div>
+      <div class="wa-thread">
+        <div class="wa-msg recv">
+          <div class="wa-sender-tag tag-ai">Gindi AI System</div>
+          <div class="wa-bubble">שלום ישראל!<br>כל הליקויים שתועדו בדירה שלך <strong>טופלו בהצלחה</strong>.<br><br>לאישור הטיפול וסגירת תיק המסירה:<br>gindi.ai/sign/close-047</div>
+          <div class="wa-time">14:22</div>
+        </div>
+        <div class="wa-msg sent">
+          <div class="wa-sender-tag tag-client">ישראל ישראלי</div>
+          <div class="wa-bubble">תודה! חתמתי</div>
+          <div class="wa-time">15:01</div>
+        </div>
+        <div class="wa-msg system">
+          <div class="wa-bubble">תיק 047 נסגר אוטומטית — כל הליקויים אושרו על ידי הדייר. כרטסת הקבלן הועברת לאישור תשלום.</div>
+          <div class="wa-time">15:01 — Gindi CRM Auto</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div style="height:40px;"></div>
+</div>
+</div>
+
+<!-- DASHBOARD PAGE -->
+<div class="page" id="page-dashboard">
   <div class="chat-panel">
     <div class="chat-header">
-      <div class="chat-header-title">
-        <div class="chat-icon">🤖</div>
-        Gindi AI Assistant
-      </div>
+      <div class="chat-header-title"><div class="chat-icon">AI</div>Gindi AI Assistant</div>
       <div class="chat-header-sub">שאל כל שאלה על ליקויים, קבלנים ומצב מסירות</div>
     </div>
     <div class="chat-body">
       <script async type="module" src="https://interfaces.zapier.com/assets/web-components/zapier-interfaces/zapier-interfaces.esm.js"></script>
-      <zapier-interfaces-chatbot-embed
-        is-popup="false"
-        chatbot-id="cmqt9j86j00ak71j7gc83z30m"
-        style="display:block; width:100%; height:100%;"
-      ></zapier-interfaces-chatbot-embed>
+      <zapier-interfaces-chatbot-embed is-popup="false" chatbot-id="cmqt9j86j00ak71j7gc83z30m" style="display:block;width:100%;height:100%;"></zapier-interfaces-chatbot-embed>
     </div>
   </div>
-
-  <!-- RIGHT: DASHBOARD -->
   <div class="dashboard-panel">
-
-    <!-- KPI CARDS -->
     <div class="kpi-grid">
-      <div class="kpi-card blue">
-        <div class="kpi-icon">📋</div>
-        <div class="kpi-label">סה"כ ליקויים שתועדו</div>
-        <div class="kpi-value">250</div>
-        <div class="kpi-desc">בפרויקט הנוכחי</div>
-      </div>
-      <div class="kpi-card green">
-        <div class="kpi-icon">✅</div>
-        <div class="kpi-label">הושלמו בהצלחה</div>
-        <div class="kpi-value">77</div>
-        <div class="kpi-desc">משימות סגורות</div>
-      </div>
-      <div class="kpi-card orange">
-        <div class="kpi-icon">⚙️</div>
-        <div class="kpi-label">בטיפול פעיל</div>
-        <div class="kpi-value">173</div>
-        <div class="kpi-desc">משימות פתוחות</div>
-      </div>
-      <div class="kpi-card red">
-        <div class="kpi-icon">📊</div>
-        <div class="kpi-label">אחוז השלמה</div>
-        <div class="kpi-value">31%</div>
-        <div class="kpi-desc">77 מתוך 250 ליקויים</div>
-      </div>
+      <div class="kpi-card blue"><div class="kpi-label">סה"כ ליקויים</div><div class="kpi-value">250</div><div class="kpi-desc">בפרויקט הנוכחי</div></div>
+      <div class="kpi-card green"><div class="kpi-label">הושלמו בהצלחה</div><div class="kpi-value">77</div><div class="kpi-desc">משימות סגורות</div></div>
+      <div class="kpi-card orange"><div class="kpi-label">בטיפול פעיל</div><div class="kpi-value">173</div><div class="kpi-desc">משימות פתוחות</div></div>
+      <div class="kpi-card red"><div class="kpi-label">אחוז השלמה</div><div class="kpi-value">31%</div><div class="kpi-desc">77 מתוך 250</div></div>
     </div>
-
-    <!-- SLA ALERT -->
     <div class="sla-card">
-      <div class="sla-alert-icon">⚠️</div>
       <div class="sla-content">
-        <div class="sla-label">🔴 חריגת SLA קריטית | צוואר בקבוק</div>
+        <div class="sla-label">חריגת SLA קריטית | צוואר בקבוק</div>
         <div class="sla-title">אלומיניום — אבי אלומיניום</div>
-        <div class="sla-sub">סך החריגה המצטברת מנוגדת ל-SLA המוגדר בחוזה. נדרשת התערבות מיידית של ראש מטה.</div>
+        <div class="sla-sub">נדרשת התערבות מיידית של ראש המטה.</div>
       </div>
-      <div class="sla-badge">
-        <div class="sla-days">444</div>
-        <div class="sla-days-label">ימי איחור</div>
-      </div>
+      <div class="sla-badge"><div class="sla-days">444</div><div class="sla-days-label">ימי איחור</div></div>
     </div>
-
-    <!-- CHARTS ROW -->
     <div class="charts-row">
       <div class="chart-card">
         <div class="chart-card-title">חלוקת ליקויים לפי קבלן</div>
         <div class="chart-card-sub">סה"כ 250 ליקויים מתועדים</div>
-        <div class="chart-container" style="height:160px;">
-          <canvas id="donutChart"></canvas>
-        </div>
+        <div style="position:relative;height:140px;"><canvas id="donutChart"></canvas></div>
       </div>
       <div class="chart-card">
         <div class="chart-card-title">סטטוס משימות לפי קבלן</div>
         <div class="chart-card-sub">פתוח vs. סגור</div>
-        <div class="chart-container" style="height:160px;">
-          <canvas id="barChart"></canvas>
-        </div>
+        <div style="position:relative;height:140px;"><canvas id="barChart"></canvas></div>
       </div>
     </div>
-
-    <!-- CONTRACTOR TABLE -->
     <div class="table-card">
-      <div class="table-header">
-        <div class="table-title">פירוט קבלנים ומצב ליקויים</div>
-        <div class="table-badge">3 קבלנים פעילים</div>
-      </div>
+      <div class="table-header"><div class="table-title">פירוט קבלנים ומצב ליקויים</div><div class="table-badge">3 קבלנים פעילים</div></div>
       <table>
-        <thead>
-          <tr>
-            <th>קבלן</th>
-            <th>תחום</th>
-            <th>סה"כ ליקויים</th>
-            <th>פתוחים</th>
-            <th>סגורים</th>
-            <th>חריגת SLA</th>
-            <th>סטטוס</th>
-          </tr>
-        </thead>
+        <thead><tr><th>קבלן</th><th>תחום</th><th>סה"כ</th><th>פתוחים</th><th>סגורים</th><th>חריגת SLA</th><th>סטטוס</th></tr></thead>
         <tbody>
-          <tr>
-            <td class="td-name">אבי אלומיניום</td>
-            <td>אלומיניום וחלונות</td>
-            <td class="td-num high">142</td>
-            <td class="td-num high">115</td>
-            <td class="td-num">27</td>
-            <td><span class="delay-pill delay-critical">444 ימים</span></td>
-            <td><span class="delay-pill delay-critical">🔴 קריטי</span></td>
-          </tr>
-          <tr>
-            <td class="td-name">שמעון חשמל</td>
-            <td>חשמל ותאורה</td>
-            <td class="td-num mid">68</td>
-            <td class="td-num mid">42</td>
-            <td class="td-num">26</td>
-            <td><span class="delay-pill delay-warning">89 ימים</span></td>
-            <td><span class="delay-pill delay-warning">🟠 גבוה</span></td>
-          </tr>
-          <tr>
-            <td class="td-name">דוד אינסטלציה</td>
-            <td>אינסטלציה ואיטום</td>
-            <td class="td-num low">40</td>
-            <td class="td-num low">16</td>
-            <td class="td-num">24</td>
-            <td><span class="delay-pill delay-ok">21 ימים</span></td>
-            <td><span class="delay-pill delay-ok">🟢 תקין</span></td>
-          </tr>
+          <tr><td class="td-name">אבי אלומיניום</td><td>אלומיניום וחלונות</td><td class="td-num high">142</td><td class="td-num high">115</td><td>27</td><td><span class="delay-pill delay-critical">444 ימים</span></td><td><span class="delay-pill delay-critical">קריטי</span></td></tr>
+          <tr><td class="td-name">שמעון חשמל</td><td>חשמל ותאורה</td><td class="td-num mid">68</td><td class="td-num mid">42</td><td>26</td><td><span class="delay-pill delay-warning">89 ימים</span></td><td><span class="delay-pill delay-warning">גבוה</span></td></tr>
+          <tr><td class="td-name">דוד אינסטלציה</td><td>אינסטלציה ואיטום</td><td class="td-num low">40</td><td class="td-num low">16</td><td>24</td><td><span class="delay-pill delay-ok">21 ימים</span></td><td><span class="delay-pill delay-ok">תקין</span></td></tr>
         </tbody>
       </table>
     </div>
-
-  </div><!-- /dashboard-panel -->
-</div><!-- /main -->
+  </div>
+</div>
 
 <script>
-  /* ══ USERS ══ */
-  const USERS = {
-    '0526008842': { name: "ג'ונתן", role: 'סמנכ"ל טכנולוגיות' },
-    '0542464444': { name: 'רועי גינדי',  role: 'בעלים' },
-    '0544277789': { name: 'יוני אסיא',   role: 'בעלים' },
-    '0542007098': { name: 'ברק טוויזר',  role: 'ראש מטה' },
-  };
+const USERS={'0526008842':{name:"ג'ונתן",role:'סמנכ"ל טכנולוגיות'},'0542464444':{name:'רועי גינדי',role:'בעלים'},'0544277789':{name:'יוני אסיא',role:'בעלים'},'0542007098':{name:'ברק טוויזר',role:'ראש מטה'}};
+document.getElementById('pass-input').addEventListener('keydown',function(e){if(e.key==='Enter')doLogin();});
+function doLogin(){
+  var v=document.getElementById('pass-input').value.trim(),u=USERS[v];
+  if(!u){document.getElementById('login-error').style.display='block';document.getElementById('pass-input').value='';document.getElementById('pass-input').focus();return;}
+  document.getElementById('display-name').textContent=u.name;
+  document.getElementById('display-role').textContent=u.role;
+  document.getElementById('display-avatar').textContent=u.name.charAt(0);
+  document.getElementById('login-overlay').style.display='none';
+}
+function showPage(id,btn){
+  document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active');});
+  document.querySelectorAll('.nav-btn').forEach(function(b){b.classList.remove('active');});
+  document.getElementById('page-'+id).classList.add('active');
+  btn.classList.add('active');
+  if(id==='dashboard')initCharts();
+}
 
-  /* ── ENTER KEY ── */
-  document.getElementById('pass-input').addEventListener('keydown', e => {
-    if (e.key === 'Enter') doLogin();
-  });
+/* DIAGRAM */
+(function(){
+  var svg=document.getElementById('mainDiagram');
+  var NS='http://www.w3.org/2000/svg';
+  var XNS='http://www.w3.org/1999/xhtml';
+  var CX=330,CY=330;
+  var R_CENTER=86, GAP1=22, W1=60, GAP2=20, W2=80;
+  var r1i=R_CENTER+GAP1, r1o=r1i+W1, r2i=r1o+GAP2, r2o=r2i+W2;
 
-  function doLogin() {
-    const val = document.getElementById('pass-input').value.trim();
-    const user = USERS[val];
-    if (!user) {
-      const err = document.getElementById('login-error');
-      err.style.display = 'block';
-      document.getElementById('pass-input').value = '';
-      document.getElementById('pass-input').focus();
-      return;
-    }
-    // Set user info in header
-    document.getElementById('display-name').textContent = user.name;
-    document.getElementById('display-role').textContent = user.role;
-    document.getElementById('display-avatar').textContent = user.name.charAt(0);
-    // Hide overlay
-    document.getElementById('login-overlay').style.display = 'none';
+  function el(tag,attrs){
+    var e=document.createElementNS(NS,tag);
+    Object.keys(attrs).forEach(function(k){e.setAttribute(k,attrs[k]);});
+    return e;
+  }
+  function polar(r,deg){
+    var a=(deg-90)*Math.PI/180;
+    return {x:CX+r*Math.cos(a),y:CY+r*Math.sin(a)};
+  }
+  function seg(ri,ro,s,e,gap){
+    gap=gap||1.2;
+    var p1=polar(ri,s+gap),p2=polar(ri,e-gap),p3=polar(ro,s+gap),p4=polar(ro,e-gap);
+    var lg=(e-s)>180?1:0;
+    return 'M'+p1.x+','+p1.y+' A'+ri+','+ri+' 0 '+lg+',1 '+p2.x+','+p2.y+' L'+p4.x+','+p4.y+' A'+ro+','+ro+' 0 '+lg+',0 '+p3.x+','+p3.y+'Z';
+  }
+  function fo(x,y,w,h,text,css){
+    var f=document.createElementNS(NS,'foreignObject');
+    f.setAttribute('x',x);f.setAttribute('y',y);f.setAttribute('width',w);f.setAttribute('height',h);f.setAttribute('overflow','visible');
+    var d=document.createElementNS(XNS,'div');
+    d.style.cssText=css;d.textContent=text;f.appendChild(d);
+    return f;
   }
 
-  /* ══ CHARTS ══ */
-  const FONT = 'Heebo';
-  Chart.defaults.font.family = FONT;
-
-  // Donut
-  new Chart(document.getElementById('donutChart'), {
-    type: 'doughnut',
-    data: {
-      labels: ['אבי אלומיניום', 'שמעון חשמל', 'דוד אינסטלציה'],
-      datasets: [{
-        data: [142, 68, 40],
-        backgroundColor: ['#E53E3E', '#DD6B20', '#2F855A'],
-        borderColor: '#fff',
-        borderWidth: 3,
-        hoverOffset: 6,
-      }]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      cutout: '68%',
-      plugins: {
-        legend: {
-          position: 'bottom',
-          labels: {
-            font: { family: FONT, size: 10, weight: '600' },
-            color: '#64748B',
-            boxWidth: 10, padding: 10,
-          }
-        },
-        tooltip: {
-          callbacks: {
-            label: ctx => ` ${ctx.label}: ${ctx.parsed} ליקויים`
-          }
-        }
-      }
-    }
+  /* RING 2: Process steps */
+  var steps=['1. פתיחת תיק מסירה ב-CRM','2. חיבור להתראות, AI ואוטומציות','3. הצבת ליקויים וסיווגם','4. שליחת עותק דיגיטלי ללקוח','5. חיתום לקוח','6. העברת תיק לקבלן לפי סיווג','7. קישור טופס דיווח לקבלן','8. התראות תקופתיות למנהל','9. סיום ביצוע — תיוג / % אוטומטי','10. שליחת אוטומציה לאישור לקוח','11. אישור כרטסת קבלן לתשלום','12. סגירת תיק המסירה'];
+  var sd=360/steps.length;
+  steps.forEach(function(s,i){
+    var st=i*sd,en=st+sd,mid=st+sd/2,c=(i%2===0)?'#F97316':'#EA580C';
+    svg.appendChild(el('path',{d:seg(r2i,r2o,st,en,1.0),fill:c+'1C',stroke:c,'stroke-width':'0.9'}));
+    var lp=polar((r2i+r2o)/2,mid);
+    svg.appendChild(fo(lp.x-46,lp.y-15,92,32,s,'font-family:Heebo,Arial;font-size:8.5px;font-weight:700;color:'+c+';text-align:center;line-height:1.3;direction:rtl;'));
   });
 
-  // Bar
-  new Chart(document.getElementById('barChart'), {
-    type: 'bar',
-    data: {
-      labels: ['אבי אלומיניום', 'שמעון חשמל', 'דוד אינסטלציה'],
-      datasets: [
-        {
-          label: 'פתוח',
-          data: [115, 42, 16],
-          backgroundColor: '#E53E3E',
-          borderRadius: 4, borderSkipped: false,
-        },
-        {
-          label: 'סגור',
-          data: [27, 26, 24],
-          backgroundColor: '#2F855A',
-          borderRadius: 4, borderSkipped: false,
-        }
-      ]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        legend: {
-          position: 'bottom',
-          labels: {
-            font: { family: FONT, size: 10, weight: '600' },
-            color: '#64748B',
-            boxWidth: 10, padding: 10,
-          }
-        }
-      },
-      scales: {
-        x: {
-          stacked: false,
-          grid: { display: false },
-          ticks: { font: { family: FONT, size: 9 }, color: '#94A3B8' }
-        },
-        y: {
-          beginAtZero: true,
-          grid: { color: 'rgba(0,0,0,0.05)' },
-          ticks: { font: { family: FONT, size: 9 }, color: '#94A3B8', stepSize: 30 }
-        }
-      }
-    }
+  /* RING 1: Modules */
+  var mods=[{t:'מודול פרויקטים',c:'#8B5CF6'},{t:'מודול אוטומציות',c:'#8B5CF6'},{t:'מודול התראות',c:'#F59E0B'},{t:'WhatsApp BOT',c:'#F59E0B'},{t:'מודול לקוחות',c:'#EC4899'},{t:'מודול מסירה',c:'#EC4899'},{t:'מודול פניות',c:'#EC4899'},{t:'מודול טפסים',c:'#14B8A6'},{t:'API / Webhook',c:'#3B82F6'},{t:'ניהול קריאות',c:'#3B82F6'},{t:'ניהול נכסים',c:'#14B8A6'},{t:'מודול דיוור',c:'#EC4899'},{t:'מודול בקרה',c:'#EC4899'},{t:'מודול משימות',c:'#EC4899'}];
+  var md=360/mods.length;
+  mods.forEach(function(m,i){
+    var st=i*md,en=st+md,mid=st+md/2;
+    svg.appendChild(el('path',{d:seg(r1i,r1o,st,en,1.0),fill:m.c+'22',stroke:m.c,'stroke-width':'0.9'}));
+    var lp=polar((r1i+r1o)/2,mid);
+    svg.appendChild(fo(lp.x-34,lp.y-11,68,24,m.t,'font-family:Heebo,Arial;font-size:8px;font-weight:700;color:'+m.c+';text-align:center;line-height:1.25;direction:rtl;white-space:nowrap;'));
   });
+
+  /* SEPARATOR RINGS */
+  [r1i-1,r1o+1,r2i-1,r2o+1].forEach(function(r){
+    svg.appendChild(el('circle',{cx:CX,cy:CY,r:r,fill:'none',stroke:'rgba(255,255,255,0.07)','stroke-width':'1'}));
+  });
+
+  /* CENTER: 4 pie segments arranged in a ring — same style as ring1/ring2 */
+  var centerItems=[
+    {t:'Business Automations',    c:'#8B5CF6'},
+    {t:'AI Agents | BOT [Claude]',c:'#C9A84C'},
+    {t:'AI [Zapier - Make]',      c:'#14B8A6'},
+    {t:'CRM + SAP B1',            c:'#3B82F6'},
+  ];
+  var R_C_O=R_CENTER+1;   /* outer edge of center ring — fits inside gap1 */
+  var R_C_I=28;            /* inner hole radius */
+  var cd=360/centerItems.length;
+
+  /* dark background circle */
+  svg.appendChild(el('circle',{cx:CX,cy:CY,r:R_C_O+2,fill:'rgba(4,12,24,0.97)',stroke:'rgba(201,168,76,0.38)','stroke-width':'1.4'}));
+
+  centerItems.forEach(function(m,i){
+    var st=i*cd, en=st+cd, mid=st+cd/2;
+    svg.appendChild(el('path',{d:seg(R_C_I,R_C_O,st,en,1.5),fill:m.c+'30',stroke:m.c,'stroke-width':'1.1'}));
+    var lp=polar((R_C_I+R_C_O)/2,mid);
+    svg.appendChild(fo(lp.x-38,lp.y-13,76,28,m.t,
+      'font-family:Heebo,Arial;font-size:8px;font-weight:800;color:'+m.c+';text-align:center;line-height:1.25;direction:ltr;white-space:normal;word-break:break-word;'));
+  });
+
+  /* tiny gold center dot */
+  svg.appendChild(el('circle',{cx:CX,cy:CY,r:R_C_I-2,fill:'rgba(4,12,24,0.97)',stroke:'rgba(201,168,76,0.25)','stroke-width':'0.8'}));
+  svg.appendChild(el('circle',{cx:CX,cy:CY,r:5,fill:'rgba(201,168,76,0.5)',stroke:'rgba(201,168,76,0.8)','stroke-width':'0.8'}));
+})();
+
+/* CHARTS */
+var chartsInited=false;
+function initCharts(){
+  if(chartsInited)return;chartsInited=true;
+  var F='Heebo';Chart.defaults.font.family=F;
+  new Chart(document.getElementById('donutChart'),{type:'doughnut',data:{labels:['אבי אלומיניום','שמעון חשמל','דוד אינסטלציה'],datasets:[{data:[142,68,40],backgroundColor:['#E53E3E','#DD6B20','#2F855A'],borderColor:'#fff',borderWidth:3,hoverOffset:6}]},options:{responsive:true,maintainAspectRatio:false,cutout:'68%',plugins:{legend:{position:'bottom',labels:{font:{family:F,size:10,weight:'600'},color:'#64748B',boxWidth:10,padding:8}},tooltip:{callbacks:{label:function(ctx){return ' '+ctx.label+': '+ctx.parsed+' ליקויים';}}}}}});
+  new Chart(document.getElementById('barChart'),{type:'bar',data:{labels:['אבי','שמעון','דוד'],datasets:[{label:'פתוח',data:[115,42,16],backgroundColor:'#E53E3E',borderRadius:4,borderSkipped:false},{label:'סגור',data:[27,26,24],backgroundColor:'#2F855A',borderRadius:4,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{font:{family:F,size:10,weight:'600'},color:'#64748B',boxWidth:10,padding:8}}},scales:{x:{grid:{display:false},ticks:{font:{family:F,size:9},color:'#94A3B8'}},y:{beginAtZero:true,grid:{color:'rgba(0,0,0,0.05)'},ticks:{font:{family:F,size:9},color:'#94A3B8',stepSize:30}}}}});
+}
 </script>
 </body>
 </html>
