@@ -3,19 +3,21 @@
   "name": "Gindi AI Enterprise Portal",
   "icons": [
     {
-      "src": "/icon-192.png",
+      "src": "icon-192.png",
       "type": "image/png",
       "sizes": "192x192"
     },
     {
-      "src": "/icon-512.png",
+      "src": "icon-512.png",
       "type": "image/png",
       "sizes": "512x512"
     }
   ],
   "start_url": "/",
   "background_color": "#ffffff",
-  "display": "standalone",
   "theme_color": "#00529B",
-  "orientation": "portrait"
+  "orientation": "portrait",
+  "display": "standalone",
+  "display_override": ["window-controls-overlay", "minimal-ui"],
+  "prefer_related_applications": false
 }
