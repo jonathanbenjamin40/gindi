@@ -1,9 +1,25 @@
-שלב 3 זה הקוד שלי , יכול לשלב לי את הקטע קוד ?<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="he" dir="rtl">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Gindi AI-Agent | פלטפורמת ניהול חכמה</title>
+
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#00529B">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/sw.js')
+        .then(reg => console.log('Service Worker registered Successfully!', reg))
+        .catch(err => console.error('Service Worker registration failed:', err));
+    });
+  }
+</script>
+
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700;800;900&display=swap');
@@ -191,7 +207,6 @@ tbody td{padding:9px 12px;font-size:12px;color:var(--navy);}
 </head>
 <body>
 
-<!-- LOGIN -->
 <div id="login-overlay">
   <div class="login-wrap">
     <div class="login-gindi-text">GINDI</div>
@@ -213,7 +228,6 @@ tbody td{padding:9px 12px;font-size:12px;color:var(--navy);}
   </div>
 </div>
 
-<!-- HEADER -->
 <div class="header">
   <div class="header-brand">
     <div class="header-logo-box">G</div>
@@ -235,7 +249,6 @@ tbody td{padding:9px 12px;font-size:12px;color:var(--navy);}
   </div>
 </div>
 
-<!-- HOME PAGE -->
 <div class="page active" id="page-home">
 <div class="home-inner">
   <div class="home-eyebrow">Powered by AI &middot; Built for Real Estate</div>
@@ -262,7 +275,6 @@ tbody td{padding:9px 12px;font-size:12px;color:var(--navy);}
 
   <div class="section-divider"></div>
 
-  <!-- FORM 1: Customer signature -->
   <div class="section-title-wrap">
     <div class="section-eyebrow">טופס דיגיטלי 1 / 3</div>
     <div class="section-title">דוח ליקויים — חתימת דייר</div>
@@ -308,7 +320,6 @@ tbody td{padding:9px 12px;font-size:12px;color:var(--navy);}
 
   <div class="section-divider"></div>
 
-  <!-- FORM 2: Contractor report -->
   <div class="section-title-wrap">
     <div class="section-eyebrow">טופס דיגיטלי 2 / 3</div>
     <div class="section-title">דוח ליקויים לקבלן מבצע — לפי סוג קבלן</div>
@@ -347,7 +358,6 @@ tbody td{padding:9px 12px;font-size:12px;color:var(--navy);}
 
   <div class="section-divider"></div>
 
-  <!-- FORM 3: Execution report -->
   <div class="section-title-wrap">
     <div class="section-eyebrow">טופס דיגיטלי 3 / 3</div>
     <div class="section-title">טופס דיווח ביצוע קבלן + העלאת תמונות</div>
@@ -388,7 +398,6 @@ tbody td{padding:9px 12px;font-size:12px;color:var(--navy);}
 
   <div class="section-divider"></div>
 
-  <!-- WHATSAPP SECTION -->
   <div class="section-title-wrap">
     <div class="section-eyebrow">אוטומציות תקשורת</div>
     <div class="section-title">הודעות WhatsApp — קבלן, לקוח, מנהל פרויקט, AI</div>
@@ -400,7 +409,7 @@ tbody td{padding:9px 12px;font-size:12px;color:var(--navy);}
       <div class="form-card-badge" style="background:rgba(37,211,102,0.12);color:#4ADE80;border-color:rgba(37,211,102,0.3);">Live Automation</div>
     </div>
     <div class="form-body">
-      <div class="wa-section-label">הקצאה ראשונית לקבלן</div>
+      <div class="wa-section-label">הקצאהראשונית לקבלן</div>
       <div class="wa-thread">
         <div class="wa-msg recv">
           <div class="wa-sender-tag tag-ai">Gindi AI System</div>
@@ -468,7 +477,6 @@ tbody td{padding:9px 12px;font-size:12px;color:var(--navy);}
 </div>
 </div>
 
-<!-- DASHBOARD PAGE -->
 <div class="page" id="page-dashboard">
   <div class="chat-panel">
     <div class="chat-header">
